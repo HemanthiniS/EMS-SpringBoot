@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5; /* Light background color for better visibility */
+        }
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="title">Employee Management System</div>
+<div class="button-container">
+    <button onclick="openPage('employee-management.html')">Employee Management</button>
+    <button onclick="openPage('department-management.html')">Department Management</button>
+    <button onclick="openPage('project-management.html')">Project Management</button>
+</div>
+
+<script>
+    function openPage(pageUrl) {
+        // Open the selected page in the same tab
+        window.location.href = pageUrl;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.demo.unit.DepartmentServiceTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2024-08-14T10:34:35" hostname="127.0.1.1hema.dcis.net" time="1.19">
+  <properties/>
+  <testcase name="testDeleteDepartment()" classname="com.example.demo.unit.DepartmentServiceTest" time="1.151"/>
+  <testcase name="testGetDepartmentById()" classname="com.example.demo.unit.DepartmentServiceTest" time="0.016"/>
+  <testcase name="testGetAllDepartments()" classname="com.example.demo.unit.DepartmentServiceTest" time="0.006"/>
+  <testcase name="testSaveDepartment()" classname="com.example.demo.unit.DepartmentServiceTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
