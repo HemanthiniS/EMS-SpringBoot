@@ -1,5 +1,7 @@
 # EMS-SpringBoot
 
+EMPLOYEE MANAGEMENT SYSTEM
+
 Overview
 
 The trainee will build a basic Employee Management System using Java Spring Boot. The application will integrate with a MySQL database and expose RESTful services for managing employees, departments, and their relationships.
