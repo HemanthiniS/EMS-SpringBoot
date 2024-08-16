@@ -1,9 +1,12 @@
 package com.example.demo.dto;
 
-public class ProjectDTO {
+import org.springframework.hateoas.RepresentationModel;
+
+public class ProjectDTO extends RepresentationModel<ProjectDTO> {
     private Long id;
     private String name;
     private Long employeeId;
+    private Integer age; // Add the age field
 
     // Getters and Setters
     public Long getId() {
@@ -29,4 +32,13 @@ public class ProjectDTO {
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
     }
+
+    public Integer getAge() {
+        return age; // Getter for age
+    }
+
+    public void setAge(Integer age) {
+        this.age = age; // Setter for age
+    }
 }
+
