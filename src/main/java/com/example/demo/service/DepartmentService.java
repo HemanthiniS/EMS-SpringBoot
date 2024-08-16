@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.assembler.DepartmentResourceAssembler;
 import com.example.demo.converter.DtoConverter;
 import com.example.demo.dto.DepartmentDTO;
 import com.example.demo.entity.Department;
@@ -21,6 +22,9 @@ public class DepartmentService {
     @Autowired
     private DtoConverter dtoConverter;
 
+    @Autowired
+    private DepartmentResourceAssembler departmentResourceAssembler;
+
     @Transactional
     public DepartmentDTO saveDepartment(DepartmentDTO departmentDTO) {
         if (departmentDTO == null) {
@@ -28,13 +32,13 @@ public class DepartmentService {
         }
         Department department = dtoConverter.toDepartmentEntity(departmentDTO);
         Department savedDepartment = departmentRepository.save(department);
-        return dtoConverter.toDepartmentDTO(savedDepartment);
+        return departmentResourceAssembler.toModel(savedDepartment);
     }
 
     @Transactional(readOnly = true)
     public List<DepartmentDTO> getAllDepartments() {
         return departmentRepository.findAll().stream()
-                .map(dtoConverter::toDepartmentDTO)
+                .map(departmentResourceAssembler::toModel)
                 .collect(Collectors.toList());
     }
 
@@ -44,7 +48,7 @@ public class DepartmentService {
             throw new IllegalArgumentException("Department ID cannot be null");
         }
         return departmentRepository.findById(id)
-                .map(dtoConverter::toDepartmentDTO);
+                .map(departmentResourceAssembler::toModel);
     }
 
     @Transactional
