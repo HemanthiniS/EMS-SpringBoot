@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.assembler.EmployeeResourceAssembler;
 import com.example.demo.converter.DtoConverter;
 import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.entity.Employee;
@@ -21,6 +22,9 @@ public class EmployeeService {
     @Autowired
     private DtoConverter dtoConverter;
 
+    @Autowired
+    private EmployeeResourceAssembler employeeResourceAssembler;
+
     @Transactional
     public EmployeeDTO saveEmployee(EmployeeDTO employeeDTO) {
         if (employeeDTO == null) {
@@ -32,13 +36,15 @@ public class EmployeeService {
 
         // Save employee and return DTO
         Employee savedEmployee = employeeRepository.save(employee);
-        return dtoConverter.toEmployeeDTO(savedEmployee);
+
+        // Return HATEOAS-enabled DTO
+        return employeeResourceAssembler.toModel(savedEmployee);
     }
 
     @Transactional(readOnly = true)
     public List<EmployeeDTO> getAllEmployees() {
         return employeeRepository.findAll().stream()
-                .map(dtoConverter::toEmployeeDTO)
+                .map(employeeResourceAssembler::toModel)
                 .collect(Collectors.toList());
     }
 
@@ -48,7 +54,7 @@ public class EmployeeService {
             throw new IllegalArgumentException("Employee ID cannot be null");
         }
         return employeeRepository.findById(id)
-                .map(dtoConverter::toEmployeeDTO);
+                .map(employeeResourceAssembler::toModel);
     }
 
     @Transactional
