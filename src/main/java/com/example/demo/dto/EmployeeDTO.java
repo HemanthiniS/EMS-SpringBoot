@@ -1,13 +1,12 @@
 package com.example.demo.dto;
 
-import java.util.Map;
+import org.springframework.hateoas.RepresentationModel;
 
-public class EmployeeDTO {
+public class EmployeeDTO extends RepresentationModel<EmployeeDTO> {
     private Long id;
     private String name;
     private String email;
     private Long departmentId;
-    private Map<String, Object> additionalFields; // Add this field
 
     // Getters and Setters
     public Long getId() {
@@ -41,5 +40,4 @@ public class EmployeeDTO {
     public void setDepartmentId(Long departmentId) {
         this.departmentId = departmentId;
     }
-
 }
