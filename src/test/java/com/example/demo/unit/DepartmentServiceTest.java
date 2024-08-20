@@ -1,9 +1,4 @@
-
-package com.example.demo.unit;
-
-import com.example.demo.dto.DepartmentDTO;
 import com.example.demo.entity.Department;
-import com.example.demo.converter.DtoConverter;
 import com.example.demo.repository.DepartmentRepository;
 import com.example.demo.service.DepartmentService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +23,6 @@ public class DepartmentServiceTest {
     @Mock
     private DepartmentRepository departmentRepository;
 
-    @Mock
-    private DtoConverter dtoConverter;
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -38,18 +30,16 @@ public class DepartmentServiceTest {
 
     @Test
     public void testSaveDepartment() {
-        DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setName("Human Resources");
-
         Department department = new Department();
         department.setName("Human Resources");
 
-        when(dtoConverter.toDepartmentEntity(departmentDTO)).thenReturn(department);
+        // Mock the repository save behavior
         when(departmentRepository.save(department)).thenReturn(department);
-        when(dtoConverter.toDepartmentDTO(department)).thenReturn(departmentDTO);
 
-        DepartmentDTO result = departmentService.saveDepartment(departmentDTO);
+        // Call the service method
+        Department result = departmentService.saveDepartment(department);
 
+        // Verify the result
         assertEquals("Human Resources", result.getName());
     }
 
@@ -61,21 +51,16 @@ public class DepartmentServiceTest {
         Department department2 = new Department();
         department2.setName("IT");
 
-        DepartmentDTO departmentDTO1 = new DepartmentDTO();
-        departmentDTO1.setName("Human Resources");
-
-        DepartmentDTO departmentDTO2 = new DepartmentDTO();
-        departmentDTO2.setName("IT");
-
+        // Mock the repository behavior
         when(departmentRepository.findAll()).thenReturn(List.of(department1, department2));
-        when(dtoConverter.toDepartmentDTO(department1)).thenReturn(departmentDTO1);
-        when(dtoConverter.toDepartmentDTO(department2)).thenReturn(departmentDTO2);
 
-        List<DepartmentDTO> result = departmentService.getAllDepartments();
+        // Call the service method
+        List<Department> result = departmentService.getAllDepartments();
 
+        // Verify the result
         assertEquals(2, result.size());
-        assertTrue(result.contains(departmentDTO1));
-        assertTrue(result.contains(departmentDTO2));
+        assertTrue(result.contains(department1));
+        assertTrue(result.contains(department2));
     }
 
     @Test
@@ -85,30 +70,74 @@ public class DepartmentServiceTest {
         department.setId(departmentId);
         department.setName("Human Resources");
 
-        DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(departmentId);
-        departmentDTO.setName("Human Resources");
-
+        // Mock the repository behavior
         when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(department));
-        when(dtoConverter.toDepartmentDTO(department)).thenReturn(departmentDTO);
 
-        Optional<DepartmentDTO> result = departmentService.getDepartmentById(departmentId);
+        // Call the service method
+        Optional<Department> result = departmentService.getDepartmentById(departmentId);
 
+        // Verify the result
         assertTrue(result.isPresent());
-        assertEquals(departmentDTO, result.get());
+        assertEquals(department, result.get());
     }
 
     @Test
     public void testDeleteDepartment() {
         Long departmentId = 1L;
 
-        // Mock the behavior of the repository to indicate that the department exists
+        // Mock the repository behavior
         when(departmentRepository.existsById(departmentId)).thenReturn(true);
 
-        // Call the delete method
+        // Call the service method
         departmentService.deleteDepartment(departmentId);
 
-        // Verify that deleteById was called with the correct ID
+        // Verify that the repository's delete method was called with the correct ID
         verify(departmentRepository).deleteById(departmentId);
     }
+
+    @Test
+    public void testDeleteDepartment_NotFound() {
+        Long departmentId = 1L;
+
+        // Mock the repository behavior
+        when(departmentRepository.existsById(departmentId)).thenReturn(false);
+
+        // Expect a RuntimeException to be thrown
+        try {
+            departmentService.deleteDepartment(departmentId);
+        } catch (RuntimeException e) {
+            assertEquals("Department not found with ID: " + departmentId, e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSaveDepartment_NullDepartment() {
+        // Expect an IllegalArgumentException to be thrown
+        try {
+            departmentService.saveDepartment(null);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Department cannot be null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetDepartmentById_NullId() {
+        // Expect an IllegalArgumentException to be thrown
+        try {
+            departmentService.getDepartmentById(null);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Department ID cannot be null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testDeleteDepartment_NullId() {
+        // Expect an IllegalArgumentException to be thrown
+        try {
+            departmentService.deleteDepartment(null);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Department ID cannot be null", e.getMessage());
+        }
+    }
 }
+
