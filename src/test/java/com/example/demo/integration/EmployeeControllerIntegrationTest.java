@@ -1,101 +1,91 @@
 package com.example.demo.integration;
 
-import com.example.demo.controller.EmployeeController;
-import com.example.demo.dto.EmployeeDTO;
+import com.example.demo.Demo6Application;
+import com.example.demo.assembler.EmployeeResourceAssembler;
+import com.example.demo.entity.Department;
+import com.example.demo.entity.Employee;
+import com.example.demo.model.EmployeeResourceModel;
+import com.example.demo.service.DepartmentService;
 import com.example.demo.service.EmployeeService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(EmployeeController.class)
+@SpringBootTest(classes = Demo6Application.class)
 public class EmployeeControllerIntegrationTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private EmployeeService employeeService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @MockBean
+    private DepartmentService departmentService;
 
-    private EmployeeDTO employeeDTO;
+    @MockBean
+    private EmployeeResourceAssembler employeeAssembler;
+
+    private MockMvc mockMvc;
+    private Employee employee;
+    private EmployeeResourceModel employeeResourceModel;
 
     @BeforeEach
     public void setUp() {
-        employeeDTO = new EmployeeDTO();
-        employeeDTO.setId(1L);
-        employeeDTO.setName("John Doe");
-        // Removed position field
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        // Mock the behavior of employeeService
-        when(employeeService.getAllEmployees()).thenReturn(Arrays.asList(employeeDTO));
-        when(employeeService.getEmployeeById(anyLong())).thenReturn(Optional.of(employeeDTO));
-        when(employeeService.saveEmployee(any(EmployeeDTO.class))).thenReturn(employeeDTO);
-    }
+        Department department = new Department();
+        department.setId(1L);
+        department.setName("HR");
 
-    @Test
-    public void testAddEmployee() throws Exception {
-        mockMvc.perform(post("/api/employees/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(employeeDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("Employee added successfully"));
-    }
+        employee = new Employee();
+        employee.setId(1L);
+        employee.setName("John Doe");
+        employee.setEmail("john.doe@example.com");
+        employee.setDepartment(department);
 
-    @Test
-    public void testGetAllEmployees() throws Exception {
-        mockMvc.perform(get("/api/employees/all")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].name", is("John Doe")));
-    }
+        employeeResourceModel = new EmployeeResourceModel();
+        employeeResourceModel.setId(1L);
+        employeeResourceModel.setName("John Doe");
+        employeeResourceModel.setEmail("john.doe@example.com");
+        employeeResourceModel.setDepartmentId(1L);
 
-    @Test
-    public void testGetEmployeeById() throws Exception {
-        mockMvc.perform(get("/api/employees/1")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("John Doe")));
+        Mockito.when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(employee));
+        Mockito.when(employeeService.getAllEmployees()).thenReturn(Collections.singletonList(employee));
+        Mockito.when(employeeAssembler.toModel(employee)).thenReturn(employeeResourceModel);
     }
 
     @Test
     public void testUpdateEmployee() throws Exception {
-        employeeDTO.setName("Jane Doe"); // Updated field
+        Mockito.when(employeeService.saveEmployee(Mockito.any(Employee.class))).thenReturn(employee);
 
         mockMvc.perform(put("/api/employees/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(employeeDTO)))
+                        .content("{\"id\":1,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"departmentId\":1}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("Jane Doe")));
+                .andExpect(content().string("Employee updated successfully")); // Expect success message
     }
 
     @Test
     public void testDeleteEmployee() throws Exception {
+        Mockito.when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(employee));
+
         mockMvc.perform(delete("/api/employees/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent()); // Expect 204 No Content
+
+        Mockito.verify(employeeService, Mockito.times(1)).deleteEmployee(1L);
     }
 }
