@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -43,6 +44,8 @@ public class EmployeeControllerIntegrationTest {
     private Employee employee;
     private EmployeeResourceModel employeeResourceModel;
 
+    private String authHeader;
+
     @BeforeEach
     public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -66,6 +69,10 @@ public class EmployeeControllerIntegrationTest {
         Mockito.when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(employee));
         Mockito.when(employeeService.getAllEmployees()).thenReturn(Collections.singletonList(employee));
         Mockito.when(employeeAssembler.toModel(employee)).thenReturn(employeeResourceModel);
+
+        // Generate Base64 encoded credentials for the Authorization header
+        String credentials = "hema:12345";
+        authHeader = "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
     }
 
     @Test
@@ -73,19 +80,22 @@ public class EmployeeControllerIntegrationTest {
         Mockito.when(employeeService.saveEmployee(Mockito.any(Employee.class))).thenReturn(employee);
 
         mockMvc.perform(put("/api/employees/1")
+                        .header("Authorization", authHeader)  // Add authentication header
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"id\":1,\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"departmentId\":1}"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Employee updated successfully")); // Expect success message
+                .andExpect(content().string("Employee updated successfully"));
     }
 
     @Test
     public void testDeleteEmployee() throws Exception {
         Mockito.when(employeeService.getEmployeeById(1L)).thenReturn(Optional.of(employee));
 
-        mockMvc.perform(delete("/api/employees/1"))
-                .andExpect(status().isNoContent()); // Expect 204 No Content
+        mockMvc.perform(delete("/api/employees/1")
+                        .header("Authorization", authHeader))  // Add authentication header
+                .andExpect(status().isNoContent());
 
         Mockito.verify(employeeService, Mockito.times(1)).deleteEmployee(1L);
     }
 }
+
