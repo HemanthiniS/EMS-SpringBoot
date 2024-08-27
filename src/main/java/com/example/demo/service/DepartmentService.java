@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.DepartmentDTO;
 import com.example.demo.entity.Department;
 import com.example.demo.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,13 @@ public class DepartmentService {
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Value("${api.key}") // Assuming the API key is stored in application.properties
+    private String validApiKey;
+
+    public boolean isValidToken(String apiKey) {
+        return validApiKey.equals(apiKey);
+    }
 
     @Transactional
     public Department saveDepartment(Department department) {
@@ -46,5 +55,9 @@ public class DepartmentService {
         }
         departmentRepository.deleteById(id);
     }
-}
 
+    @Transactional(readOnly = true)
+    public List<DepartmentDTO> getDepartmentDTOs() {
+        return departmentRepository.findDepartmentDTOs();
+    }
+}
