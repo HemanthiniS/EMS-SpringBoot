@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.dto.EmployeeDTO;
 import com.example.demo.entity.Employee;
 import com.example.demo.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,5 +46,10 @@ public class EmployeeService {
             throw new RuntimeException("Employee not found with ID: " + id);
         }
         employeeRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EmployeeDTO> getHistoricalEmployeeEngagement() {
+        return employeeRepository.findHistoricalEmployeeEngagement();
     }
 }
