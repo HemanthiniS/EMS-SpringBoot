@@ -24,6 +24,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
     implementation 'org.hibernate.validator:hibernate-validator:7.0.1.Final'
+    implementation 'com.google.protobuf:protobuf-java:3.21.12' // Update to a safe version
+    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
+    //implementation 'org.springframework.boot:spring-boot-starter-security' // Or your version
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -33,9 +37,9 @@ dependencies {
         useJUnitPlatform()
         jvmArgs = ['-Xmx512m', '-XX:+UseG1GC', '-XX:+EnableDynamicAgentLoading']
     }
-
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
