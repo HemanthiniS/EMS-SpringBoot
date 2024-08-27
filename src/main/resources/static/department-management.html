@@ -59,6 +59,9 @@
     </form>
 </div>
 <script>
+    const apiUrl = 'http://localhost:8080/api/departments';
+    const apiKey = 'AB12CD34EF56GH78IJ90KL12MN34OP56QR78ST90UVWX12YZ34';
+
     document.getElementById('departmentForm').addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -70,9 +73,10 @@
             name: name
         };
 
-        fetch('/api/departments/add', {
+        fetch(apiUrl + '/add', {
             method: 'POST',
             headers: {
+                'API-Key': apiKey,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(department)
