@@ -57,11 +57,21 @@
         <input type="text" id="employeeName" placeholder="Name" required>
         <input type="email" id="employeeEmail" placeholder="Email" required>
         <input type="number" id="departmentId" placeholder="Department ID" required>
-
+        <input type="number" id="projectId" placeholder="Project ID">
         <button type="submit">Add Employee</button>
     </form>
 </div>
 <script>
+    const apiUrl = 'http://localhost:8080/api/employees';
+    const username = 'hema'; // Replace with your actual username
+    const password = '12345'; // Replace with your actual password
+
+    // Function to create Basic Auth header
+    function getAuthHeader() {
+        const base64Credentials = btoa(`${username}:${password}`);
+        return `Basic ${base64Credentials}`;
+    }
+
     document.getElementById('employeeForm').addEventListener('submit', (event) => {
         event.preventDefault();
 
@@ -69,29 +79,42 @@
         const name = document.getElementById('employeeName').value;
         const email = document.getElementById('employeeEmail').value;
         const departmentId = document.getElementById('departmentId').value;
+        const projectId = document.getElementById('projectId').value;
 
         const newEmployee = {
             id: parseInt(id, 10),
             name: name,
             email: email,
             departmentId: parseInt(departmentId, 10),
+            projectId: projectId ? parseInt(projectId, 10) : null
         };
 
         fetch('/api/employees/add', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': getAuthHeader() // Add the Basic Auth header
             },
             body: JSON.stringify(newEmployee)
         })
-            .then(response => response.text())
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error('Error adding employee');
+                }
+            })
             .then(result => {
                 alert(result);
                 document.getElementById('employeeForm').reset();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding employee');
+            });
     });
 </script>
 </body>
 </html>
+
 
