@@ -6,7 +6,6 @@ import com.example.demo.entity.Department;
 import com.example.demo.model.DepartmentResourceModel;
 import com.example.demo.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +48,9 @@ public class DepartmentController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<DepartmentResourceModel>> getAllDepartments(@RequestHeader(value = "API-Key", required = false) String apiKey) {
+    public ResponseEntity<?> getAllDepartments(@RequestHeader(value = "API-Key", required = false) String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
         }
 
         List<Department> departments = departmentService.getAllDepartments();
@@ -62,10 +61,10 @@ public class DepartmentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DepartmentResourceModel> getDepartmentById(@PathVariable Long id,
-                                                                     @RequestHeader(value = "API-Key", required = false) String apiKey) {
+    public ResponseEntity<?> getDepartmentById(@PathVariable Long id,
+                                               @RequestHeader(value = "API-Key", required = false) String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
         }
 
         Optional<Department> department = departmentService.getDepartmentById(id);
@@ -75,11 +74,11 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DepartmentResourceModel> updateDepartment(@PathVariable Long id,
-                                                                    @RequestBody DepartmentResourceModel departmentResourceModel,
-                                                                    @RequestHeader(value = "API-Key", required = false) String apiKey) {
+    public ResponseEntity<?> updateDepartment(@PathVariable Long id,
+                                              @RequestBody DepartmentResourceModel departmentResourceModel,
+                                              @RequestHeader(value = "API-Key", required = false) String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
         }
 
         Optional<Department> existingDepartmentOptional = departmentService.getDepartmentById(id);
@@ -96,10 +95,10 @@ public class DepartmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id,
-                                                 @RequestHeader(value = "API-Key", required = false) String apiKey) {
+    public ResponseEntity<?> deleteDepartment(@PathVariable Long id,
+                                              @RequestHeader(value = "API-Key", required = false) String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
         }
 
         if (!departmentService.getDepartmentById(id).isPresent()) {
@@ -111,9 +110,9 @@ public class DepartmentController {
     }
 
     @GetMapping("/dtos")
-    public ResponseEntity<List<DepartmentDTO>> getDepartmentDTOs(@RequestHeader(value = "API-Key", required = false) String apiKey) {
+    public ResponseEntity<?> getDepartmentDTOs(@RequestHeader(value = "API-Key", required = false) String apiKey) {
         if (!isValidApiKey(apiKey)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid API Key");
         }
 
         List<DepartmentDTO> departmentDTOs = departmentService.getDepartmentDTOs();
@@ -124,6 +123,5 @@ public class DepartmentController {
         return validApiKey.equals(apiKey);
     }
 }
-
 
 
