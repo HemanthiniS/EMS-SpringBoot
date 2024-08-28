@@ -1,4 +1,4 @@
-      package com.example.demo.integration;
+package com.example.demo.integration;
 
 import com.example.demo.controller.DepartmentController;
 import com.example.demo.dto.DepartmentDTO;
